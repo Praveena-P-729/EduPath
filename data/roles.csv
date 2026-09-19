@@ -1,0 +1,7 @@
+role_id,role_name,description,required_skills,optional_skills,min_experience_years
+1,Full-Stack Developer,"Builds complete client and server applications from UI to database and deployment","React,JavaScript,REST APIs,FastAPI,PostgreSQL,Docker,Git & GitHub,Testing (PyTest/Jest)","TypeScript,Node.js,Redis,AWS Cloud,System Design,Tailwind CSS",0
+2,Frontend Engineer,"Specializes in user interfaces, client state, performance, and responsive web design","React,JavaScript,TypeScript,HTML & CSS,Tailwind CSS,REST APIs,Git & GitHub","Next.js,Testing (PyTest/Jest),GraphQL",0
+3,Backend Engineer,"Specializes in APIs, business logic, microservices, databases, and authentication","Python,FastAPI,REST APIs,PostgreSQL,SQL,Docker,Git & GitHub,Testing (PyTest/Jest)","Redis,Node.js,Kubernetes,AWS Cloud,System Design",0
+4,AI / ML Engineer,"Develops predictive machine learning models, neural networks, and LLM applications","Python,Machine Learning Basics,Deep Learning & PyTorch,RAG & LLM Engineering,FastAPI,SQL","Docker,AWS Cloud,PostgreSQL",0
+5,Data Scientist,"Extracts actionable insights, builds statistical models, and performs data analytics","Python,SQL,Machine Learning Basics,PostgreSQL,Git & GitHub","Deep Learning & PyTorch,FastAPI,AWS Cloud",0
+6,DevOps & Cloud Specialist,"Automates infrastructure, CI/CD pipelines, container orchestration, and cloud reliability","Docker,Docker Compose,Kubernetes,CI/CD Pipelines,AWS Cloud,Git & GitHub,Linux","Python,PostgreSQL,System Design",1

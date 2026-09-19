@@ -1,0 +1,23 @@
+import numpy as np
+from typing import List
+
+def get_text_vector(text: str, dim: int = 64) -> np.ndarray:
+    """Deterministic hash embedding generator for local semantic distance calculation"""
+    vec = np.zeros(dim)
+    words = text.lower().replace("-", " ").replace("/", " ").split()
+    if not words:
+        return vec
+    for w in words:
+        h = hash(w) % dim
+        vec[h] += 1.0
+    norm = np.linalg.norm(vec)
+    if norm > 0:
+        vec = vec / norm
+    return vec
+
+def cosine_similarity(vec_a: np.ndarray, vec_b: np.ndarray) -> float:
+    norm_a = np.linalg.norm(vec_a)
+    norm_b = np.linalg.norm(vec_b)
+    if norm_a == 0 or norm_b == 0:
+        return 0.0
+    return float(np.dot(vec_a, vec_b) / (norm_a * norm_b))

@@ -1,0 +1,13 @@
+resource_id,skill_name,title,resource_type,duration,difficulty,url,rating,author_or_source
+1,React,"React Official Documentation & Interactive Tutorials",Documentation,"4 Hours",Beginner,"https://react.dev",4.9,"React Core Team"
+2,React,"Full-Stack React & Modern Hooks Masterclass",Course,"6 Hours",Intermediate,"https://react.dev/learn",4.9,"EduPath AI Academy"
+3,JavaScript,"JavaScript.info - The Modern JavaScript Tutorial",Interactive Guide,"10 Hours",Beginner,"https://javascript.info",4.9,"Ilya Kantor"
+4,FastAPI,"FastAPI Official Tutorial - User Guide",Documentation,"5 Hours",Intermediate,"https://fastapi.tiangolo.com/tutorial/",5.0,"Sebastián Ramírez"
+5,FastAPI,"Building Production REST APIs with FastAPI & SQLAlchemy",Course,"6 Hours",Intermediate,"https://fastapi.tiangolo.com",4.8,"Python Dev Hub"
+6,PostgreSQL,"PostgreSQL Relational Schema Design & Indexing Lab",Interactive Lab,"4 Hours",Intermediate,"https://www.postgresql.org/docs/",4.8,"PostgreSQL Global Dev Group"
+7,Docker,"Docker Zero to Hero: Containerization from Scratch",Video Tutorial,"3.5 Hours",Intermediate,"https://docs.docker.com/get-started/",4.9,"Docker Inc."
+8,Docker Compose,"Multi-Container Full-Stack Architecture with Docker Compose",Interactive Lab,"3 Hours",Intermediate,"https://docs.docker.com/compose/",4.8,"Cloud Native Foundation"
+9,System Design,"The System Design Primer - Scalable Microservices",Interactive Guide,"8 Hours",Advanced,"https://github.com/donnemartin/system-design-primer",5.0,"Donne Martin"
+10,Testing (PyTest/Jest),"Automated Unit & Integration Testing in Python & React",Course,"4 Hours",Intermediate,"https://docs.pytest.org",4.7,"Quality Engineering Lab"
+11,REST APIs,"RESTful API Architectural Constraints & Best Practices",Article,"2 Hours",Beginner,"https://restfulapi.net",4.8,"Roy Fielding Reference"
+12,RAG & LLM Engineering,"Retrieval-Augmented Generation & Embeddings Practical Guide",Interactive Guide,"5 Hours",Advanced,"https://python.langchain.com",4.9,"LangChain Community"
