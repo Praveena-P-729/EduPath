@@ -26,6 +26,27 @@ export const ResumeUpload = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
   const [error, setError] = useState('');
+  const [newSkillInput, setNewSkillInput] = useState('');
+
+  const handleRemoveSkill = (skillToRemove) => {
+    if (!analysisResult) return;
+    setAnalysisResult((prev) => ({
+      ...prev,
+      detectedSkills: prev.detectedSkills.filter((s) => s !== skillToRemove)
+    }));
+  };
+
+  const handleAddSkill = () => {
+    const trimmed = newSkillInput.trim();
+    if (!trimmed || !analysisResult) return;
+    if (!analysisResult.detectedSkills.includes(trimmed)) {
+      setAnalysisResult((prev) => ({
+        ...prev,
+        detectedSkills: [...prev.detectedSkills, trimmed]
+      }));
+    }
+    setNewSkillInput('');
+  };
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -217,10 +238,17 @@ export const ResumeUpload = () => {
 
             <button
               type="button"
-              onClick={() => navigate('/skills')}
+              onClick={() =>
+                navigate('/skills', {
+                  state: {
+                    detectedSkills: analysisResult.detectedSkills,
+                    candidateName: analysisResult.candidateName
+                  }
+                })
+              }
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold shadow-xs transition-colors"
             >
-              <span>View Skill Gap Analysis</span>
+              <span>Confirm & View Skill Gap Analysis</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -262,21 +290,63 @@ export const ResumeUpload = () => {
             </div>
           </div>
 
-          {/* Detected Skills */}
-          <div>
-            <h4 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider flex items-center gap-2 mb-3">
-              <Sparkles className="w-4 h-4 text-[#0F766E]" />
-              Detected Technical Skills ({analysisResult.detectedSkills?.length})
-            </h4>
+          {/* Detected Skills - Editable */}
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <h4 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#0F766E]" />
+                Detected Technical Skills ({analysisResult.detectedSkills?.length})
+              </h4>
+              <span className="text-[11px] text-[#64748B]">Click (✕) to remove or add custom skills below</span>
+            </div>
+
+            {/* Skill Tag Chips */}
             <div className="flex flex-wrap gap-2">
               {analysisResult.detectedSkills?.map((skill, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1 rounded-md bg-[#F0FDFA] border border-[#CCFBF1] text-[#0F766E] text-xs font-medium"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-[#F0FDFA] border border-[#CCFBF1] text-[#0F766E] text-xs font-medium group transition-colors"
                 >
-                  {skill}
+                  <span>{skill}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveSkill(skill)}
+                    className="p-0.5 rounded text-[#0F766E]/60 hover:text-[#DC2626] hover:bg-[#FEE2E2] transition-colors"
+                    title={`Remove ${skill}`}
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
                 </span>
               ))}
+            </div>
+
+            {/* Add Skill Input */}
+            <div className="flex items-center gap-2 pt-1 max-w-md">
+              <input
+                type="text"
+                value={newSkillInput}
+                onChange={(e) => setNewSkillInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddSkill();
+                  }
+                }}
+                placeholder="Add missing skill (e.g. Docker, GraphQL, Redis)..."
+                className="flex-1 px-3 py-1.5 text-xs bg-white border border-[#CBD5E1] rounded-lg focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] outline-none text-[#0F172A]"
+              />
+              <button
+                type="button"
+                onClick={handleAddSkill}
+                disabled={!newSkillInput.trim()}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                  newSkillInput.trim()
+                    ? 'bg-[#0F766E] hover:bg-[#115E59] text-white shadow-xs'
+                    : 'bg-[#F1F5F9] text-[#94A3B8] border border-[#E2E8F0] cursor-not-allowed'
+                }`}
+              >
+                + Add Skill
+              </button>
             </div>
           </div>
 

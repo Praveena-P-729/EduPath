@@ -21,7 +21,12 @@ class UserResponse(UserBase):
 
     model_config = {"from_attributes": True}
 
+class GoogleAuthRequest(BaseModel):
+    email: EmailStr
+    full_name: Optional[str] = None
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: dict
+

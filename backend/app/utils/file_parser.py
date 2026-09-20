@@ -1,37 +1,56 @@
-import io
-import re
-from typing import Optional
+import pymupdf
+from docx import Document
 
-def extract_text_from_pdf(file_bytes: bytes) -> str:
+
+def extract_text_from_pdf(file_path: str) -> str:
+    """
+    Extract text from a PDF file.
+    """
+
     text = ""
-    try:
-        import PyPDF2
-        pdf_reader = PyPDF2.PdfReader(io.BytesIO(file_bytes))
-        for page in pdf_reader.pages:
-            extracted = page.extract_text()
-            if extracted:
-                text += extracted + "\n"
-    except Exception as e:
-        # Fallback to UTF-8 decoded text stripping null bytes
-        text = file_bytes.decode("utf-8", errors="ignore")
+
+    pdf = pymupdf.open(file_path)
+
+    for page in pdf:
+        text += page.get_text()
+
+    pdf.close()
+
     return text.strip()
 
-def extract_text_from_docx(file_bytes: bytes) -> str:
-    text = ""
-    try:
-        import docx
-        doc = docx.Document(io.BytesIO(file_bytes))
-        for p in doc.paragraphs:
-            text += p.text + "\n"
-    except Exception as e:
-        text = file_bytes.decode("utf-8", errors="ignore")
-    return text.strip()
 
-def extract_resume_text(file_bytes: bytes, filename: str) -> str:
-    ext = filename.split(".")[-1].lower() if "." in filename else ""
-    if ext == "pdf":
-        return extract_text_from_pdf(file_bytes)
-    elif ext in ["docx", "doc"]:
-        return extract_text_from_docx(file_bytes)
+def extract_text_from_docx(file_path: str) -> str:
+    """
+    Extract text from a DOCX file.
+    """
+
+    document = Document(file_path)
+
+    text = []
+
+    for paragraph in document.paragraphs:
+        if paragraph.text.strip():
+            text.append(paragraph.text)
+
+    return "\n".join(text).strip()
+
+
+def extract_text(file_path: str) -> str:
+    """
+    Detect the file type and extract text.
+    """
+
+    if file_path.lower().endswith(".pdf"):
+        return extract_text_from_pdf(file_path)
+
+    elif file_path.lower().endswith(".docx"):
+        return extract_text_from_docx(file_path)
+
     else:
-        return file_bytes.decode("utf-8", errors="ignore").strip()
+        raise ValueError(
+            "Unsupported file type. Please upload PDF or DOCX."
+        )
+
+
+def extract_resume_text(file_path: str) -> str:
+    return extract_text(file_path)

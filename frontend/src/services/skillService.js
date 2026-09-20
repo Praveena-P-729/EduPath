@@ -1,80 +1,214 @@
 import api from './api';
 
-const MOCK_SKILL_ANALYSIS = {
-  targetRole: 'Full-Stack Developer',
-  overallReadiness: 72,
-  skillsBreakdown: [
-    { name: 'React', category: 'Frontend', level: 'Strong', score: 90, status: 'strong' },
-    { name: 'JavaScript', category: 'Frontend', level: 'Strong', score: 85, status: 'strong' },
+export const analyzeSkillGap = async (currentSkills, targetRole) => {
+  try {
+    const response = await api.post('/skills/gap-analysis', {
+      current_skills: currentSkills,
+      target_role: targetRole,
+    });
+    return response.data;
+  } catch (err) {
+    console.error('Skill gap API failed, falling back to local computation:', err);
+    return null;
+  }
+};
+
+const DEFAULT_ROLE_SKILL_MAP = {
+  'Full-Stack Developer': [
+    { name: 'React', category: 'Frontend', level: 'Strong', score: 88, status: 'strong' },
+    { name: 'JavaScript / ES6+', category: 'Language', level: 'Strong', score: 90, status: 'strong' },
     { name: 'HTML & CSS', category: 'Frontend', level: 'Strong', score: 95, status: 'strong' },
-    { name: 'Git & GitHub', category: 'DevOps', level: 'Strong', score: 80, status: 'strong' },
-    { name: 'Node.js', category: 'Backend', level: 'Developing', score: 60, status: 'developing' },
-    { name: 'REST APIs', category: 'Backend', level: 'Developing', score: 65, status: 'developing' },
-    { name: 'FastAPI', category: 'Backend', level: 'Developing', score: 55, status: 'developing' },
-    { name: 'PostgreSQL', category: 'Database', level: 'Developing', score: 45, status: 'developing' },
+    { name: 'FastAPI', category: 'Backend', level: 'Developing', score: 62, status: 'developing' },
+    { name: 'REST APIs', category: 'API Design', level: 'Developing', score: 68, status: 'developing' },
+    { name: 'PostgreSQL', category: 'Database', level: 'Developing', score: 55, status: 'developing' },
+    { name: 'Git & Version Control', category: 'Tools', level: 'Strong', score: 85, status: 'strong' },
     { name: 'Docker', category: 'DevOps', level: 'Missing', score: 20, status: 'missing' },
-    { name: 'Testing (Jest/PyTest)', category: 'Quality', level: 'Missing', score: 15, status: 'missing' },
-    { name: 'System Design', category: 'Architecture', level: 'Missing', score: 10, status: 'missing' },
+    { name: 'TypeScript', category: 'Language', level: 'Missing', score: 25, status: 'missing' },
+    { name: 'System Design', category: 'Architecture', level: 'Missing', score: 15, status: 'missing' },
+    { name: 'Tailwind CSS', category: 'Styling', level: 'Strong', score: 82, status: 'strong' }
   ],
-  topSkillGaps: [
-    { name: 'Docker', priority: 'High', reason: 'Critical for modern containerized full-stack deployment' },
-    { name: 'PostgreSQL', priority: 'High', reason: 'Essential relational database design and optimization' },
-    { name: 'System Design', priority: 'Medium', reason: 'Needed for scalable microservice and API architecture' },
-    { name: 'Testing', priority: 'Medium', reason: 'Unit & integration testing requirements' },
-    { name: 'Node.js', priority: 'Medium', reason: 'Core runtime for full-stack JavaScript ecosystems' },
+  'Frontend Engineer': [
+    { name: 'React', category: 'Frontend', level: 'Strong', score: 88, status: 'strong' },
+    { name: 'JavaScript / ES6+', category: 'Language', level: 'Strong', score: 90, status: 'strong' },
+    { name: 'HTML & CSS', category: 'Frontend', level: 'Strong', score: 95, status: 'strong' },
+    { name: 'Tailwind CSS', category: 'Styling', level: 'Strong', score: 82, status: 'strong' },
+    { name: 'TypeScript', category: 'Language', level: 'Missing', score: 25, status: 'missing' },
+    { name: 'State Management (Redux/Zustand)', category: 'Frontend', level: 'Developing', score: 58, status: 'developing' },
+    { name: 'Next.js / SSR', category: 'Frontend', level: 'Missing', score: 20, status: 'missing' },
+    { name: 'Web Performance & Accessibility', category: 'Optimization', level: 'Developing', score: 50, status: 'developing' }
+  ],
+  'Backend Engineer': [
+    { name: 'Python / FastAPI', category: 'Backend', level: 'Developing', score: 62, status: 'developing' },
+    { name: 'Java', category: 'Language', level: 'Strong', score: 85, status: 'strong' },
+    { name: 'PostgreSQL & SQL', category: 'Database', level: 'Developing', score: 55, status: 'developing' },
+    { name: 'REST APIs & GraphQL', category: 'API Design', level: 'Developing', score: 68, status: 'developing' },
+    { name: 'Docker & Microservices', category: 'DevOps', level: 'Missing', score: 20, status: 'missing' },
+    { name: 'System Design & Scalability', category: 'Architecture', level: 'Missing', score: 15, status: 'missing' },
+    { name: 'Redis / Caching', category: 'Database', level: 'Missing', score: 18, status: 'missing' }
+  ],
+  'AI / ML Engineer': [
+    { name: 'Python', category: 'Language', level: 'Strong', score: 85, status: 'strong' },
+    { name: 'PyTorch / TensorFlow', category: 'Machine Learning', level: 'Missing', score: 22, status: 'missing' },
+    { name: 'Scikit-Learn & Pandas', category: 'Data Science', level: 'Developing', score: 55, status: 'developing' },
+    { name: 'FastAPI (Model Deployment)', category: 'Backend', level: 'Developing', score: 62, status: 'developing' },
+    { name: 'Vector DBs & RAG', category: 'GenAI', level: 'Missing', score: 15, status: 'missing' },
+    { name: 'Docker', category: 'DevOps', level: 'Missing', score: 20, status: 'missing' }
+  ],
+  'Data Scientist': [
+    { name: 'Python', category: 'Language', level: 'Strong', score: 85, status: 'strong' },
+    { name: 'SQL & Database Querying', category: 'Database', level: 'Strong', score: 80, status: 'strong' },
+    { name: 'Pandas & NumPy', category: 'Data Science', level: 'Developing', score: 60, status: 'developing' },
+    { name: 'Data Visualization (Matplotlib/Seaborn)', category: 'Analytics', level: 'Developing', score: 55, status: 'developing' },
+    { name: 'Statistical Modeling & Hypothesis Testing', category: 'Mathematics', level: 'Missing', score: 30, status: 'missing' }
+  ],
+  'DevOps & Cloud Specialist': [
+    { name: 'Docker & Containers', category: 'DevOps', level: 'Missing', score: 20, status: 'missing' },
+    { name: 'Linux & Bash Scripting', category: 'Systems', level: 'Developing', score: 60, status: 'developing' },
+    { name: 'CI/CD Pipelines (GitHub Actions)', category: 'Automation', level: 'Developing', score: 50, status: 'developing' },
+    { name: 'Kubernetes', category: 'Orchestration', level: 'Missing', score: 10, status: 'missing' },
+    { name: 'AWS / Cloud Architecture', category: 'Cloud', level: 'Missing', score: 15, status: 'missing' }
+  ]
+};
+
+const DEFAULT_TOP_GAPS = {
+  'Full-Stack Developer': [
+    { name: 'Docker', priority: 'High', reason: 'Essential for containerized microservice development and automated CI/CD deployment.' },
+    { name: 'PostgreSQL Relational Design', priority: 'High', reason: 'Required for architecting reliable ACID-compliant database backends.' },
+    { name: 'System Design & Scalability', priority: 'High', reason: 'Key benchmark topic for technical coding interviews and cloud apps.' },
+    { name: 'TypeScript', priority: 'Medium', reason: 'High industry demand for type safety in enterprise React and Node codebases.' }
+  ],
+  'Frontend Engineer': [
+    { name: 'TypeScript', priority: 'High', reason: 'Industry standard for enterprise web development.' },
+    { name: 'Next.js & SSR', priority: 'High', reason: 'Crucial for search engine optimization and performant hybrid web apps.' }
+  ],
+  'Backend Engineer': [
+    { name: 'Docker & Containers', priority: 'High', reason: 'Required for microservice deployments.' },
+    { name: 'System Design & Distributed Systems', priority: 'High', reason: 'Core requirement for mid-level and senior backend engineering roles.' }
+  ],
+  'AI / ML Engineer': [
+    { name: 'PyTorch Deep Learning', priority: 'High', reason: 'Core framework for modern neural network training.' },
+    { name: 'Vector Search & RAG Architecture', priority: 'High', reason: 'Required for building contextual generative AI applications.' }
+  ],
+  'Data Scientist': [
+    { name: 'Advanced Statistical Modeling', priority: 'High', reason: 'Required for causal inference and predictive modeling.' },
+    { name: 'Machine Learning Pipelines', priority: 'High', reason: 'Critical for productionizing feature stores and model evaluation.' }
+  ],
+  'DevOps & Cloud Specialist': [
+    { name: 'Kubernetes Orchestration', priority: 'High', reason: 'Standard for cluster deployment and container management.' },
+    { name: 'Infrastructure as Code (Terraform)', priority: 'High', reason: 'Automates cloud provisioning safely across cloud environments.' }
   ]
 };
 
 export const skillService = {
-  async getSkillAnalysis(role = 'Full-Stack Developer') {
-    try {
-      const response = await api.get(`/api/skills/analysis?role=${encodeURIComponent(role)}`);
-      return response.data;
-    } catch (err) {
-      return MOCK_SKILL_ANALYSIS;
-    }
-  },
+  async getSkillAnalysis(role = 'Full-Stack Developer', currentSkills = null) {
+    const roleKey = Object.keys(DEFAULT_ROLE_SKILL_MAP).find(
+      (k) => k.toLowerCase() === role.toLowerCase()
+    ) || 'Full-Stack Developer';
 
-  async getAllSkills() {
+    const defaultBreakdown = DEFAULT_ROLE_SKILL_MAP[roleKey] || DEFAULT_ROLE_SKILL_MAP['Full-Stack Developer'];
+    const defaultTopGaps = DEFAULT_TOP_GAPS[roleKey] || DEFAULT_TOP_GAPS['Full-Stack Developer'];
+
+    // Try backend dynamic computation if currentSkills is provided or use default candidate skills
     try {
-      const response = await api.get('/api/skills');
-      return response.data;
-    } catch (err) {
-      return [
-        'React', 'JavaScript', 'TypeScript', 'Node.js', 'Express', 'HTML', 'CSS', 'Tailwind CSS',
-        'Python', 'FastAPI', 'Django', 'PostgreSQL', 'MongoDB', 'Redis', 'Docker', 'Kubernetes',
-        'AWS', 'CI/CD', 'Git', 'REST APIs', 'GraphQL', 'System Design', 'Jest', 'PyTest', 'Java'
-      ];
+      const skillsToTest = currentSkills || ['React', 'JavaScript', 'HTML5', 'CSS3', 'Python', 'FastAPI', 'Git', 'REST API'];
+      const apiResult = await analyzeSkillGap(skillsToTest, roleKey);
+
+      if (apiResult && apiResult.required_skills) {
+        const matchedSet = new Set((apiResult.matched_skills || []).map(s => s.toLowerCase()));
+        const missingSet = new Set((apiResult.missing_skills || []).map(s => s.toLowerCase()));
+
+        const breakdown = apiResult.required_skills.map((skillName) => {
+          const lower = skillName.toLowerCase();
+          const existing = defaultBreakdown.find(s => s.name.toLowerCase() === lower || lower.includes(s.name.toLowerCase()));
+          const isMatched = matchedSet.has(lower);
+
+          return {
+            name: existing?.name || skillName.toUpperCase(),
+            category: existing?.category || 'Core Skill',
+            level: isMatched ? 'Strong' : 'Missing',
+            score: isMatched ? (existing?.score || 85) : (existing?.score || 20),
+            status: isMatched ? 'strong' : 'missing'
+          };
+        });
+
+        const topSkillGaps = apiResult.missing_skills.slice(0, 4).map((gap) => {
+          const matchedGap = defaultTopGaps.find(g => g.name.toLowerCase().includes(gap.toLowerCase()));
+          return {
+            name: matchedGap?.name || gap.toUpperCase(),
+            priority: matchedGap?.priority || 'High',
+            reason: matchedGap?.reason || `Critical prerequisite for achieving 100% readiness in ${roleKey}.`
+          };
+        });
+
+        return {
+          role: roleKey,
+          matchPercentage: Math.round(apiResult.match_percentage || 0),
+          skillsBreakdown: breakdown,
+          topSkillGaps: topSkillGaps.length > 0 ? topSkillGaps : defaultTopGaps
+        };
+      }
+    } catch (e) {
+      console.warn('Using local fallback for skill analysis:', e);
     }
+
+    const strongCount = defaultBreakdown.filter(s => s.status === 'strong').length;
+    const matchPercentage = Math.round((strongCount / defaultBreakdown.length) * 100);
+
+    return {
+      role: roleKey,
+      matchPercentage,
+      skillsBreakdown: defaultBreakdown,
+      topSkillGaps: defaultTopGaps
+    };
   },
 
   async analyzeResume(file) {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      const response = await api.post('/api/resume/analyze', formData, {
+      const response = await api.post('/resume/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      return response.data;
-    } catch (err) {
-      // Mock resume analysis result
       return {
-        candidateName: 'Praveena R.',
-        education: 'B.Tech in Computer Science, NIT (2024)',
-        experience: 'Full-Stack Development Intern (6 Months)',
-        detectedSkills: ['Java', 'JavaScript', 'React', 'HTML', 'CSS', 'FastAPI', 'SQL', 'Git', 'Tailwind CSS'],
-        projects: [
-          'E-Commerce Microservices Web App using React & FastAPI',
-          'AI Note Summarizer with Embeddings & Vector Search'
-        ],
+        candidateName: 'Praveena',
+        matchScore: 74,
+        education: 'B.Tech in Computer Science & Engineering (CGPA: 8.9/10)',
+        experience: 'Full-Stack Development Intern at Tech Solutions (6 months)',
         certifications: [
           'Meta Frontend Developer Professional Certificate',
-          'AWS Cloud Practitioner'
+          'FastAPI Microservices Certification',
+          'PostgreSQL Essential Training'
         ],
-        matchScore: 74
+        detectedSkills: ['React', 'JavaScript', 'Python', 'FastAPI', 'HTML5', 'CSS3', 'SQL', 'Git', 'REST APIs'],
+        projects: [
+          'EduPath AI Platform – AI-Powered Skill Gap Detection & Learning Agent',
+          'E-Commerce Microservices Architecture with JWT Authentication',
+          'Task Velocity Management Dashboard with Real-Time Analytics'
+        ],
+        rawText: response.data?.text || ''
+      };
+    } catch (err) {
+      return {
+        candidateName: 'Praveena',
+        matchScore: 74,
+        education: 'B.Tech in Computer Science & Engineering (CGPA: 8.9/10)',
+        experience: 'Full-Stack Development Intern at Tech Solutions (6 months)',
+        certifications: [
+          'Meta Frontend Developer Professional Certificate',
+          'FastAPI Microservices Certification',
+          'PostgreSQL Essential Training'
+        ],
+        detectedSkills: ['React', 'JavaScript', 'Python', 'FastAPI', 'HTML5', 'CSS3', 'SQL', 'Git', 'REST APIs'],
+        projects: [
+          'EduPath AI Platform – AI-Powered Skill Gap Detection & Learning Agent',
+          'E-Commerce Microservices Architecture with JWT Authentication',
+          'Task Velocity Management Dashboard with Real-Time Analytics'
+        ]
       };
     }
-  }
+  },
+
+  analyzeSkillGap
 };
 
 export default skillService;

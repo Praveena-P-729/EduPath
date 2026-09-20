@@ -1,5 +1,138 @@
 from typing import List, Dict, Any
 
+SKILL_TOPICS_KB: Dict[str, List[str]] = {
+    "git": [
+        "Git basics",
+        "Git branches",
+        "Git merge and rebase",
+        "GitHub workflow"
+    ],
+    "rest api": [
+        "HTTP methods",
+        "JSON",
+        "REST API concepts",
+        "API requests",
+        "Axios"
+    ],
+    "typescript": [
+        "TypeScript basics",
+        "Types and variables",
+        "Interfaces",
+        "Functions",
+        "TypeScript with React"
+    ],
+    "javascript": [
+        "JavaScript basics",
+        "Functions",
+        "Arrays and objects",
+        "DOM manipulation",
+        "Async JavaScript"
+    ],
+    "react": [
+        "React components",
+        "Props and state",
+        "React hooks",
+        "React Router",
+        "API integration"
+    ],
+    "node.js": [
+        "Node.js basics",
+        "Modules",
+        "NPM",
+        "Express.js",
+        "Building REST APIs"
+    ],
+    "nodejs": [
+        "Node.js basics",
+        "Modules",
+        "NPM",
+        "Express.js",
+        "Building REST APIs"
+    ],
+    "express.js": [
+        "Express basics",
+        "Routes",
+        "Middleware",
+        "REST APIs",
+        "Error handling"
+    ],
+    "express": [
+        "Express basics",
+        "Routes",
+        "Middleware",
+        "REST APIs",
+        "Error handling"
+    ],
+    "sql": [
+        "SQL basics",
+        "SELECT queries",
+        "INSERT, UPDATE and DELETE",
+        "JOINs",
+        "Database design"
+    ],
+    "html": [
+        "Semantic HTML5 tags",
+        "Forms and input validation",
+        "Document structure and DOM",
+        "Accessibility (a11y) basics"
+    ],
+    "css": [
+        "CSS Box Model",
+        "Flexbox and Grid layouts",
+        "Responsive media queries",
+        "CSS transitions and animations"
+    ],
+    "python": [
+        "Python syntax and variables",
+        "Control flow and loops",
+        "Functions and modules",
+        "Object-Oriented Programming (OOP)",
+        "Virtual environments and packages"
+    ],
+    "fastapi": [
+        "FastAPI routing and endpoints",
+        "Pydantic schemas and validation",
+        "Dependency injection system",
+        "Interactive Swagger documentation"
+    ],
+    "postgresql": [
+        "Relational schema modeling",
+        "Indexes and query optimization",
+        "Foreign keys and constraints",
+        "Transactions and ACID properties"
+    ],
+    "docker": [
+        "Docker architecture and containers",
+        "Writing Dockerfiles",
+        "Multi-container setups with Docker Compose",
+        "Image optimization and deployment"
+    ]
+}
+
+
+def generate_learning_path(missing_skills: List[str]) -> List[Dict[str, Any]]:
+    """
+    Generate a structured learning path with topics for given missing skills.
+    If a skill is unknown, returns {"skill": skill, "topics": []}.
+    """
+    learning_path = []
+
+    for skill in missing_skills:
+        skill_clean = skill.strip().lower()
+        if skill_clean in SKILL_TOPICS_KB:
+            learning_path.append({
+                "skill": skill.strip(),
+                "topics": SKILL_TOPICS_KB[skill_clean]
+            })
+        else:
+            learning_path.append({
+                "skill": skill.strip(),
+                "topics": []
+            })
+
+    return learning_path
+
+
 def generate_personalized_roadmap(target_role: str = "Full-Stack Developer") -> List[Dict[str, Any]]:
     role_clean = target_role.lower() if target_role else "full-stack developer"
 

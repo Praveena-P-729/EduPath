@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   CheckCircle2,
   XCircle,
@@ -6,12 +7,19 @@ import {
   ArrowRight,
   RotateCcw,
   Award,
+  AlertTriangle,
+  Sparkles,
+  Layers,
+  BookOpen
 } from 'lucide-react';
 import progressService from '../services/progressService';
 import Loading from '../components/Loading';
 
 export const Practice = () => {
-  const [category, setCategory] = useState('All');
+  const location = useLocation();
+  const navigate = useNavigate();
+  const initialSkill = location.state?.skill || 'All';
+  const [category, setCategory] = useState(initialSkill);
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,8 +30,9 @@ export const Practice = () => {
   const [score, setScore] = useState(0);
   const [userAnswers, setUserAnswers] = useState({});
   const [quizFinished, setQuizFinished] = useState(false);
+  const [adaptiveMessage, setAdaptiveMessage] = useState(null);
 
-  const categories = ['All', 'MCQ', 'Coding', 'Debugging', 'Interview Questions'];
+  const categories = ['All', 'React', 'FastAPI', 'REST APIs', 'Database', 'Docker', 'MCQ', 'Coding'];
 
   useEffect(() => {
     const loadQuestions = async () => {
@@ -37,6 +46,7 @@ export const Practice = () => {
         setScore(0);
         setUserAnswers({});
         setQuizFinished(false);
+        setAdaptiveMessage(null);
       } finally {
         setLoading(false);
       }
@@ -70,12 +80,32 @@ export const Practice = () => {
     }));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
       setSelectedOption(userAnswers[currentIndex + 1]?.selected ?? null);
       setSubmitted(!!userAnswers[currentIndex + 1]);
     } else {
+      const finalScore = score;
+      const total = questions.length;
+      const percentage = Math.round((finalScore / total) * 100);
+
+      if (percentage < 60) {
+        setAdaptiveMessage({
+          type: 'replan',
+          skill: category === 'All' ? 'React & Backend' : category,
+          title: 'Adaptive Learning Agent Triggered ⚠️',
+          message: `Accuracy (${percentage}%) in ${category === 'All' ? 'core topics' : category} fell below the 60% threshold. The Adaptive Learning Agent has re-sequenced your roadmap to insert dedicated foundational revision modules before advanced topics.`
+        });
+      } else {
+        setAdaptiveMessage({
+          type: 'success',
+          skill: category,
+          title: 'Competency Milestone Passed! 🎉',
+          message: `Great job scoring ${percentage}%! Your mastery in ${category === 'All' ? 'core competencies' : category} has been verified and updated in your profile.`
+        });
+      }
+
       setQuizFinished(true);
     }
   };
@@ -87,6 +117,7 @@ export const Practice = () => {
     setScore(0);
     setUserAnswers({});
     setQuizFinished(false);
+    setAdaptiveMessage(null);
   };
 
   if (loading) {
@@ -152,11 +183,32 @@ export const Practice = () => {
               Your Score: {Math.round((score / questions.length) * 100)}%
             </h2>
             <p className="text-xs text-[#64748B] mt-1 max-w-md mx-auto">
-              You correctly answered {score} out of {questions.length} questions. Your readiness score has been adjusted by +2%.
+              You correctly answered {score} out of {questions.length} questions.
             </p>
           </div>
 
-          <div className="flex justify-center gap-3 pt-2">
+          {/* Adaptive Agent Feedback Callout Banner */}
+          {adaptiveMessage && (
+            <div
+              className={`p-4 sm:p-5 rounded-xl border text-left max-w-xl mx-auto space-y-2 ${
+                adaptiveMessage.type === 'replan'
+                  ? 'bg-[#FEF3C7] border-[#FDE68A] text-[#92400E]'
+                  : 'bg-[#F0FDFA] border-[#CCFBF1] text-[#0F766E]'
+              }`}
+            >
+              <div className="flex items-center gap-2 font-bold text-xs">
+                {adaptiveMessage.type === 'replan' ? (
+                  <AlertTriangle className="w-4 h-4 text-[#D97706]" />
+                ) : (
+                  <Sparkles className="w-4 h-4 text-[#0F766E]" />
+                )}
+                <span>{adaptiveMessage.title}</span>
+              </div>
+              <p className="text-xs leading-relaxed opacity-90">{adaptiveMessage.message}</p>
+            </div>
+          )}
+
+          <div className="flex flex-wrap justify-center gap-3 pt-2">
             <button
               type="button"
               onClick={handleRestart}
@@ -168,10 +220,10 @@ export const Practice = () => {
 
             <button
               type="button"
-              onClick={() => setCategory('All')}
+              onClick={() => navigate('/roadmap')}
               className="px-5 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white rounded-lg text-xs font-semibold shadow-xs flex items-center gap-2 transition-colors"
             >
-              <span>Explore More Categories</span>
+              <span>View Updated Learning Roadmap</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

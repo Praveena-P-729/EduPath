@@ -111,3 +111,60 @@ def get_me(current_user: User = Depends(get_current_user), db: Session = Depends
         "skillGaps": 8,
         "learningHours": 24
     }
+
+
+@router.post("/google", response_model=TokenResponse)
+def google_auth(google_data: dict, db: Session = Depends(get_db)):
+    email = google_data.get("email", "").strip().lower()
+    if not email or "@" not in email:
+        raise HTTPException(status_code=400, detail="A valid Google email address is required.")
+
+    name = google_data.get("full_name") or google_data.get("fullName")
+    if not name:
+        name = email.split("@")[0].replace(".", " ").replace("_", " ").title()
+
+    user_id = 1
+    target_role = "Full-Stack Developer"
+
+    try:
+        user = db.query(User).filter(User.email == email).first()
+        if not user:
+            user = User(
+                email=email,
+                hashed_password=get_password_hash("google_oauth_pass"),
+                full_name=name,
+                role="learner"
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+
+            new_profile = Profile(
+                user_id=user.id,
+                target_role="Full-Stack Developer"
+            )
+            db.add(new_profile)
+            db.commit()
+        user_id = user.id
+        profile = db.query(Profile).filter(Profile.user_id == user.id).first()
+        if profile and profile.target_role:
+            target_role = profile.target_role
+    except Exception as e:
+        db.rollback()
+
+    token = create_access_token(data={"sub": email, "id": user_id})
+
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": {
+            "id": user_id,
+            "email": email,
+            "fullName": name,
+            "targetRole": target_role,
+            "streak": 6,
+            "careerReadiness": 72
+        }
+    }
+
+

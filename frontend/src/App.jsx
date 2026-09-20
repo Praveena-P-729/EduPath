@@ -25,6 +25,7 @@ import Login from './pages/Login';
 import Profile from './pages/Profile';
 import ResumeUpload from './pages/ResumeUpload';
 import SkillAnalysis from './pages/SkillAnalysis';
+import Roadmap from './pages/Roadmap';
 import LearningPath from './pages/LearningPath';
 import WeeklyPlan from './pages/WeeklyPlan';
 import Practice from './pages/Practice';
@@ -414,6 +415,22 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <SkillAnalysis />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/skill-analysis"
+            element={
+              <ProtectedRoute>
+                <SkillAnalysis />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/roadmap"
+            element={
+              <ProtectedRoute>
+                <Roadmap />
               </ProtectedRoute>
             }
           />

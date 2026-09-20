@@ -3,7 +3,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database.models import init_db
-
+from app.api.resume import router as resume_router
+from app.api.skills import router as skills_router
 # Routers
 from app.api.auth import router as auth_router
 from app.api.profile import router as profile_router
@@ -15,6 +16,7 @@ from app.api.practice import router as practice_router
 from app.api.progress import router as progress_router
 from app.api.reports import router as reports_router
 from app.api.chat import router as chat_router
+from app.api.roadmap import router as roadmap_router
 
 # Initialize database schema and CSV seeds
 init_db()
@@ -52,7 +54,7 @@ app.include_router(practice_router)
 app.include_router(progress_router)
 app.include_router(reports_router)
 app.include_router(chat_router)
-
+app.include_router(roadmap_router)
 @app.get("/")
 def root():
     return {

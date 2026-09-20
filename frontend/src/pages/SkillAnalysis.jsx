@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Target,
   Sparkles,
@@ -16,6 +16,8 @@ import Loading from '../components/Loading';
 
 export const SkillAnalysis = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const detectedSkills = location.state?.detectedSkills || null;
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('All');
@@ -23,12 +25,16 @@ export const SkillAnalysis = () => {
 
   useEffect(() => {
     const loadAnalysis = async () => {
-      setLoading(false);
-      const result = await skillService.getSkillAnalysis(selectedRole);
-      setData(result);
+      setLoading(true);
+      try {
+        const result = await skillService.getSkillAnalysis(selectedRole, detectedSkills);
+        setData(result);
+      } finally {
+        setLoading(false);
+      }
     };
     loadAnalysis();
-  }, [selectedRole]);
+  }, [selectedRole, detectedSkills]);
 
   if (loading || !data) {
     return <Loading type="pulse" text="Calculating AI Skill Gap Matrix..." />;
@@ -66,11 +72,18 @@ export const SkillAnalysis = () => {
         {/* Action Button */}
         <button
           type="button"
-          onClick={() => navigate('/learning-path')}
+          onClick={() =>
+            navigate('/roadmap', {
+              state: {
+                targetRole: selectedRole,
+                missingSkills: missingSkills.map((s) => s.name)
+              }
+            })
+          }
           className="px-5 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center gap-2 shrink-0"
         >
           <Zap className="w-4 h-4" />
-          <span>Build Learning Path</span>
+          <span>Generate My Learning Roadmap</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>
@@ -83,7 +96,7 @@ export const SkillAnalysis = () => {
           <select
             value={selectedRole}
             onChange={(e) => setSelectedRole(e.target.value)}
-            className="w-full mt-2 px-3 py-2 text-xs font-medium bg-white border border-[#CBD5E1] rounded-lg focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] text-[#0F172A] outline-none"
+            className="w-full mt-2 px-3 py-2 text-xs font-medium bg-white border border-[#CBD5E1] rounded-lg focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] text-[#0F172A] outline-none cursor-pointer"
           >
             <option value="Full-Stack Developer">Full-Stack Developer</option>
             <option value="Frontend Engineer">Frontend Engineer</option>
@@ -94,7 +107,7 @@ export const SkillAnalysis = () => {
           </select>
           <div className="mt-3 text-[11px] text-[#64748B] flex items-center gap-1">
             <Target className="w-3.5 h-3.5 text-[#0F766E]" />
-            <span>11 Core competencies benchmarked</span>
+            <span>{data.skillsBreakdown.length} Core competencies benchmarked</span>
           </div>
         </div>
 
@@ -142,7 +155,7 @@ export const SkillAnalysis = () => {
           <h3 className="text-xs font-bold uppercase tracking-wider text-[#CCFBF1]">Top Priority Skill Gaps to Close</h3>
         </div>
         <p className="text-xs text-slate-300 mb-4 max-w-2xl">
-          Closing these core requirements will increase your target career readiness score from <strong className="text-white">72% to 94%</strong>.
+          Closing these core requirements will increase your target career readiness score to <strong className="text-white">94%+</strong>.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

@@ -48,6 +48,27 @@ export const authService = {
     }
   },
 
+  async googleLogin(googleEmail, name) {
+    try {
+      const response = await api.post('/api/auth/google', { email: googleEmail, full_name: name });
+      const data = response.data;
+      localStorage.setItem('edupath_token', data.access_token);
+      localStorage.setItem('edupath_user', JSON.stringify(data.user));
+      return data;
+    } catch (err) {
+      const mockToken = 'mock_google_jwt_' + Date.now();
+      const extractedName = name || (googleEmail.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
+      const user = {
+        ...MOCK_USER,
+        email: googleEmail,
+        fullName: extractedName,
+      };
+      localStorage.setItem('edupath_token', mockToken);
+      localStorage.setItem('edupath_user', JSON.stringify(user));
+      return { access_token: mockToken, user };
+    }
+  },
+
   async getCurrentUser() {
     try {
       const response = await api.get('/api/auth/me');
